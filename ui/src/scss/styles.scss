@@ -1,0 +1,22 @@
+@import "~bootstrap/scss/bootstrap";
+
+body {
+  background-color: #3b3b3b;
+}
+
+main {
+  height: 100vh;
+  max-height: 100vh;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+#main-content {
+
+min-width: 500px;
+
+}
+
+.nav svg {
+margin-right: 10px;
+}

@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fabrico Ledger Dashboard</title>
+  </head>
+  <body>
+	  
+	<main class="d-flex flex-nowrap">
+
+	<div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 280px;">
+    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+      <img src="gfx/logo.svg" alt="Fabrico Ledger"/>
+    </a>
+    <hr>
+    <ul class="nav nav-pills flex-column mb-auto">
+      <li class="nav-item">
+        <a href="#" class="nav-link active" aria-current="page" role="button" data-bs-toggle="pill" data-bs-target="#system-status">
+           <i class="fa fa-circle-info"></i>
+          System
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-link text-white" role="button" data-bs-toggle="pill" data-bs-target="#upload">
+          <i class="fa fa-upload"></i>
+          Upload
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-link text-white" role="button" data-bs-toggle="pill" data-bs-target="#fabricate" id="nav-fabricate">
+          <i class="fa fa-print"></i>
+          Fabricate
+        </a>
+      </li>
+    </ul>
+    <hr>
+    <div class="dropdown">
+      <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <img src="https://github.com/fabian-z.png" alt="" width="32" height="32" class="rounded-circle me-2">
+        <strong>fabian-z</strong>
+      </a>
+      <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+        <li><a class="dropdown-item" href="#">Settings</a></li>
+        <li><a class="dropdown-item" href="#">Profile</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="#">Sign out</a></li>
+      </ul>
+    </div>
+  </div>
+  
+  
+    <div class="d-flex flex-column flex-shrink-0 p-3 text-white" id="main-content">
+		
+    <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+        <span class="fs-4">Node <span id="NodeID">Unknown</span></span>
+    </header>
+  
+  <div class="tab-content">
+	 <div id="system-status" class="tab-pane fade show active">
+		
+	  <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
+		
+      <div class="table-responsive">
+        <table class="table table-striped table-sm table-dark">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Header</th>
+              <th scope="col">Header</th>
+              <th scope="col">Header</th>
+              <th scope="col">Header</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1,001</td>
+              <td>random</td>
+              <td>data</td>
+              <td>placeholder</td>
+              <td>text</td>
+            </tr>
+            <tr>
+              <td>1,002</td>
+              <td>placeholder</td>
+              <td>irrelevant</td>
+              <td>visual</td>
+              <td>layout</td>
+            </tr>
+            <tr>
+              <td>1,003</td>
+              <td>data</td>
+              <td>rich</td>
+              <td>dashboard</td>
+              <td>tabular</td>
+            </tr>
+            <tr>
+              <td>1,003</td>
+              <td>information</td>
+              <td>placeholder</td>
+              <td>illustrative</td>
+              <td>data</td>
+            </tr>
+            <tr>
+              <td>1,004</td>
+              <td>text</td>
+              <td>random</td>
+              <td>layout</td>
+              <td>dashboard</td>
+            </tr>
+            <tr>
+              <td>1,005</td>
+              <td>dashboard</td>
+              <td>irrelevant</td>
+              <td>text</td>
+              <td>placeholder</td>
+            </tr>
+            <tr>
+              <td>1,006</td>
+              <td>dashboard</td>
+              <td>illustrative</td>
+              <td>rich</td>
+              <td>data</td>
+            </tr>
+            <tr>
+              <td>1,007</td>
+              <td>placeholder</td>
+              <td>tabular</td>
+              <td>information</td>
+              <td>irrelevant</td>
+            </tr>
+            <tr>
+              <td>1,008</td>
+              <td>random</td>
+              <td>data</td>
+              <td>placeholder</td>
+              <td>text</td>
+            </tr>
+            <tr>
+              <td>1,009</td>
+              <td>placeholder</td>
+              <td>irrelevant</td>
+              <td>visual</td>
+              <td>layout</td>
+            </tr>
+            <tr>
+              <td>1,010</td>
+              <td>data</td>
+              <td>rich</td>
+              <td>dashboard</td>
+              <td>tabular</td>
+            </tr>
+            <tr>
+              <td>1,011</td>
+              <td>information</td>
+              <td>placeholder</td>
+              <td>illustrative</td>
+              <td>data</td>
+            </tr>
+            <tr>
+              <td>1,012</td>
+              <td>text</td>
+              <td>placeholder</td>
+              <td>layout</td>
+              <td>dashboard</td>
+            </tr>
+            <tr>
+              <td>1,013</td>
+              <td>dashboard</td>
+              <td>irrelevant</td>
+              <td>text</td>
+              <td>visual</td>
+            </tr>
+            <tr>
+              <td>1,014</td>
+              <td>dashboard</td>
+              <td>illustrative</td>
+              <td>rich</td>
+              <td>data</td>
+            </tr>
+            <tr>
+              <td>1,015</td>
+              <td>random</td>
+              <td>tabular</td>
+              <td>information</td>
+              <td>text</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div id="upload" class="tab-pane fade">
+		
+		<form id="upload-form">
+		<div>
+          <label for="uploadFile" class="form-label">Upload GCODE File</label>
+          <input class="form-control form-control-lg" id="uploadFile" name="uploadFile" type="file">
+        </div>
+        
+        <hr>
+        
+        <div>
+          <label for="selectNode" class="form-label">Select allowed printer</label>
+        <select id="selectNode" name="selectNode" class="form-select" size="3" multiple>
+          <option value="1">Node 1</option>
+          <option value="2">Node 2</option>
+          <option value="3">Node 3</option>
+        </select>
+        </div>
+        
+        <hr>
+        
+         <div>
+          <label for="partCount" class="form-label">Select allowed part count per printer</label>
+        <input class="form-control form-control-lg" type="number" value="1" id="partCount" name="partCount">
+        </div>
+        
+        <hr>
+        </form>
+        
+        <button id="upload-submit" class="btn btn-primary">Submit</button>
+        
+    </div>
+    
+    <div id="fabricate" class="tab-pane fade">
+		<form id="fabricate-form">
+		<select class="form-select" aria-label="Default select example" id="partSelect" name="partSelect">
+          <option selected>Select part to fabricate</option>
+        </select>
+		</form>
+        <hr>
+         <button id="fabricate-refresh" class="btn btn-primary">Refresh</button> <button id="fabricate-submit" class="btn btn-primary">Submit</button>
+    </div>
+    </div>
+  </main>
+  
+    <script src="./main.js"></script>
+  </body>
+</html>

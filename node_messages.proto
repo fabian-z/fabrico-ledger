@@ -1,0 +1,46 @@
+// Copyright IBM Corp. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
+syntax = "proto3";
+option go_package = "./app;main";
+import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
+
+package fabrico;
+
+service NodeExchange {
+   rpc ConsensusMessage(stream Consensus) returns(google.protobuf.Empty) {}
+   rpc FetchBlocks(BlockPosition) returns(stream BlockRecord) {}
+   rpc DownloadContent(ContentID) returns(stream ContentChunk) {}
+}
+
+message ContentChunk {
+    bytes chunk = 1;
+}
+
+message ContentID {
+    bytes id = 1;
+}
+
+message BlockPosition {
+    uint64 viewId = 1;
+    uint64 latestSequence = 2;
+}
+
+message BlockRecord {
+    bytes metadata = 1; //opaque view metadata
+    repeated bytes batch = 2;
+    bytes prevHash = 3;
+}
+
+message FwdMessage {
+    uint64 sender = 1;
+    bytes payload = 2;
+}
+
+message Consensus {
+    uint64 node = 1;
+    google.protobuf.Any message = 2;
+}
