@@ -36,7 +36,7 @@ func (a *APIServer) ServeHTTP(endpoint string) error {
 	http.HandleFunc("/api/addfile", a.AddFile)
 	http.HandleFunc("/api/fabricate", a.Fabricate)
 
-	http.Handle("/", http.FileServer(http.Dir("../ui/dist/")))
+	http.Handle("/", http.FileServer(http.Dir("ui/dist/")))
 
 	return http.ListenAndServe(endpoint, nil)
 }
