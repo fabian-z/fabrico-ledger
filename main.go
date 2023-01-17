@@ -55,9 +55,9 @@ func main() {
 	tmpdir, _ := ioutil.TempDir("", "app-"+nodeName)
 
 	tlsPaths := TLSPaths{
-		NodeCertificate: path.Join("..", "ca", nodeName+".crt"),
-		NodeKey:         path.Join("..", "ca", nodeName+".key"),
-		CaCertificate:   path.Join("..", "ca", "ca.crt"),
+		NodeCertificate: path.Join("res", "ca", nodeName+".crt"),
+		NodeKey:         path.Join("res", "ca", nodeName+".key"),
+		CaCertificate:   path.Join("res", "ca", "ca.crt"),
 	}
 
 	node := newNode(NodeID(*selfID), tmpdir, tlsPaths, true, 10)

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
@@ -9,6 +11,7 @@ import (
 	"net"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/go-uuid"
 )
@@ -224,16 +227,59 @@ func (a *APIServer) Fabricate(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	fabricationConn, err := net.Dial("tcp", a.FabricationEndpoint)
-	if err != nil {
-		http.Error(w, "Communication error", http.StatusInternalServerError)
-		return
-	}
+	// TODO refactor long running communication into  another module!
+	go func() {
+		fabricationConn, err := net.Dial("udp", a.FabricationEndpoint)
+		if err != nil {
+			a.Node.app.logger.Error("Communication error: ", err)
+			http.Error(w, "Communication error", http.StatusInternalServerError)
+			return
+		}
 
-	n, err := fabricationConn.Write(fabricationData)
-	if n != len(fabricationData) || err != nil {
-		http.Error(w, "Communication error", http.StatusInternalServerError)
-		return
-	}
+		scannerOut := bufio.NewScanner(bytes.NewReader(fabricationData))
+		scannerIn := bufio.NewScanner(fabricationConn)
+
+		// optionally, resize scanner's capacity for lines over 64K, see next example
+		for scannerOut.Scan() {
+			// Write command
+			command := bytes.TrimSpace(scannerOut.Bytes())
+			if len(command) == 0 {
+				continue
+			}
+			if command[0] == byte(';') {
+				continue
+			}
+
+			a.Node.app.logger.Debugf("Sending command to printer: %s", command)
+			n, err := fabricationConn.Write(command)
+			if n != len(command) || err != nil {
+				a.Node.app.logger.Error("Communication error: ", err)
+				return
+			}
+
+			// Wait for status
+			if scannerIn.Scan() {
+				response := scannerIn.Text()
+				a.Node.app.logger.Debug("Got response from printer:", response)
+				responseSplit := strings.Split(response, " ")
+				if len(responseSplit) < 1 {
+					a.Node.app.logger.Error("Communication error: Response too short")
+					return
+				}
+				if responseSplit[0] != "ok" {
+					a.Node.app.logger.Errorf("Communication error: Response not ok, got '%v'", response)
+					return
+				}
+			}
+
+		}
+
+		if err := scannerOut.Err(); err != nil {
+			a.Node.app.logger.Error("Communication error: ", err)
+			return
+		}
+	}()
+
+	fmt.Fprint(w, "Started fabrication")
 
 }
