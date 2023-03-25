@@ -12,6 +12,7 @@ require (
 )
 
 require (
+	github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/miekg/dns v1.1.43 // indirect
 )
