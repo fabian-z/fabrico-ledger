@@ -6,6 +6,8 @@
 
 Fabrico Ledger is a project for prototyping a byzantine-fault tolerant distributed ledger system for secure and decentralized distribution of licenses and production data for computer-aided manufacturing systems, such as additive manufacturing / 3D printing and CNC machines.
 
+An integrated digital twin simulating G-Code manufacturing provides the ability to control tolerances and provide quality assurance throughout the complete process.
+
 Interfaces and functions will be developed for three parties, running a full node each:
 
 - Original manufacturer (data provider)
@@ -14,8 +16,7 @@ Interfaces and functions will be developed for three parties, running a full nod
 
 Project work for DHBW Lörrach.
 
-
-## Used technologies
+## Used key technologies
 
 - SmartBFT Consensus Algorithm / Library
 - gRPC (with TLS) & Protobuf
@@ -24,8 +25,6 @@ Project work for DHBW Lörrach.
   - X25519
   - ECIES with ChaCha20-Poly1305
 - mDNS & DNS-SD for automatic Node Discovery
-
-
 
 ## User Interface
 
