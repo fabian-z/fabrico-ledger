@@ -1,8 +1,8 @@
 module github.com/fabian-z/fabrico-ledger
 
-go 1.19
+go 1.20
 
-replace github.com/SmartBFT-Go/consensus/v2 => github.com/fabian-z/consensus/v2 v2.0.0-20221128114342-11dd18c41432
+replace github.com/SmartBFT-Go/consensus/v2 => github.com/fabian-z/consensus/v2 v2.0.0-20230325230833-2dbab1095020
 
 require (
 	github.com/SmartBFT-Go/consensus/v2 v2.3.0

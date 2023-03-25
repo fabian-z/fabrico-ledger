@@ -53,8 +53,8 @@ github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymF
 github.com/envoyproxy/go-control-plane v0.9.1-0.20191026205805-5f8ba28d4473/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/go-control-plane v0.9.4/go.mod h1:6rpuAdCZL397s3pYoYcLgu1mIlRU8Am5FuJP05cCM98=
 github.com/envoyproxy/protoc-gen-validate v0.1.0/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
-github.com/fabian-z/consensus/v2 v2.0.0-20221128114342-11dd18c41432 h1:XHii/03gBUTpvY1aXfMFBhcj8NngzQ7nGPh6Kn/HqCA=
-github.com/fabian-z/consensus/v2 v2.0.0-20221128114342-11dd18c41432/go.mod h1:nBQZ73M6+MB/zMI5AQt+oWzZpTMad65bTaXO5170Il8=
+github.com/fabian-z/consensus/v2 v2.0.0-20230325230833-2dbab1095020 h1:76h2qaz5av2aO9bpNKCs4558yrkYrmBBhdNEuYgBRSo=
+github.com/fabian-z/consensus/v2 v2.0.0-20230325230833-2dbab1095020/go.mod h1:nBQZ73M6+MB/zMI5AQt+oWzZpTMad65bTaXO5170Il8=
 github.com/felixge/httpsnoop v1.0.3 h1:s/nj+GCswXYzN5v2DpNMuMQYe+0DDwt5WVCU6CWBdXk=
 github.com/form3tech-oss/jwt-go v3.2.2+incompatible/go.mod h1:pbq4aXjuKjdthFRnoDwaVPLA+WlJuPGy+QneDUgJi2k=
 github.com/fsouza/fake-gcs-server v1.40.2 h1:u78RgNH8CZ8q9g/w1Z3duFjdrWE8i+wo/yWnVngZ55Q=
