@@ -91,7 +91,6 @@ func (d *ListDiscoverer) GetPeers() <-chan Peer {
 	return listener
 }
 
-// TODO Implement MDNS for LAN
 type MdnsDiscoverer struct {
 	server         *zeroconf.Server
 	cancelDiscover context.CancelFunc
