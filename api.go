@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/hashicorp/go-uuid"
 )
@@ -23,7 +24,13 @@ type APIServer struct {
 
 type NodeStatus struct {
 	// TODO Extend this status message
-	NodeID NodeID
+	NodeID         NodeID
+	LeaderID       uint64
+	ViewID         uint64
+	SystemNodes    []uint64
+	LastUpdateTime string
+	Records        int
+	TotalFiles     int
 }
 
 type AvailableData struct {
@@ -45,8 +52,23 @@ func (a *APIServer) ServeHTTP(endpoint string) error {
 }
 
 func (a *APIServer) NodeStatus(w http.ResponseWriter, _ *http.Request) {
+
+	a.Node.cb.aggregationLock.Lock()
+	knownFiles := len(a.Node.cb.knownFiles)
+	a.Node.cb.aggregationLock.Unlock()
+
+	a.Node.cb.lock.RLock()
+	records := len(a.Node.cb.records)
+	a.Node.cb.lock.RUnlock()
+
 	status := &NodeStatus{
-		NodeID: a.Node.id,
+		NodeID:         a.Node.id,
+		LeaderID:       a.Node.app.Consensus.GetLeaderID(),
+		SystemNodes:    a.Node.Nodes(),
+		ViewID:         a.Node.app.latestMD.ViewId,
+		LastUpdateTime: time.Now().Format(time.RFC1123),
+		Records:        records,
+		TotalFiles:     knownFiles,
 	}
 
 	encoder := json.NewEncoder(w)

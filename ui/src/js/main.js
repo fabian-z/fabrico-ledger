@@ -17,16 +17,49 @@ Chart.defaults.color = '#fff';
 
 // Fetch node status / id
 
+//	NodeID         NodeID
+//	LeaderID       uint64
+//	ViewID         uint64
+//	SystemNodes    []uint64
+//	LastUpdateTime string
+
 let nodeID;
-fetch('/api/status')
- .then(response => response.json())
- .then(json => {
-	nodeID = json.NodeID;
-	document.getElementById("NodeID").innerHTML = nodeID;   
-	})
-.catch((error) => {
-  console.error('Error:', error);
-});
+let leaderID;
+let viewID;
+let systemNodes;
+let lastUpdateTime;
+let records;
+let totalFiles;
+
+function updateStatus() {
+  fetch('/api/status')
+  .then(response => response.json())
+  .then(json => {
+   nodeID = json.NodeID;
+   leaderID = json.LeaderID;
+   viewID = json.ViewID;
+   systemNodes = json.SystemNodes;
+   lastUpdateTime = json.LastUpdateTime;
+   records = json.Records;
+   totalFiles = json.TotalFiles;
+
+   document.getElementById("NodeID").innerHTML = nodeID;
+   document.getElementById("LeaderID").innerHTML = leaderID;
+ 
+   document.getElementById("ViewID").innerHTML = viewID;   
+   document.getElementById("SystemNodes").innerHTML = systemNodes;   
+   document.getElementById("LastUpdateTime").innerHTML = lastUpdateTime;
+
+   document.getElementById("Records").innerHTML = records;
+   document.getElementById("TotalFiles").innerHTML = totalFiles;
+   })
+ .catch((error) => {
+   console.error('Error:', error);
+ });
+
+}
+
+let updateStatusInterval = setInterval(updateStatus, 1000);
 
 document.getElementById("upload-submit").addEventListener('click', (event) => {
 // TODO error handling
@@ -58,7 +91,7 @@ fetch('/api/availabledata')
 
 
 let select = document.getElementById('partSelect');
-
+select.replaceChildren();
 
 for (const data of json){
    // data.OriginatingID

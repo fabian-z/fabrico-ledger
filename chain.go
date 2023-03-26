@@ -37,13 +37,16 @@ func (cb *committedBatches) add(record *AppRecord) {
 
 	md := &smartbftprotos.ViewMetadata{}
 	if err := proto.Unmarshal(record.Metadata, md); err != nil {
+		cb.lock.Unlock() // in case we recover later
 		panic(err)
 	}
 
 	if cb.latestMD.ViewId > md.ViewId {
+		cb.lock.Unlock()
 		return
 	}
 	if cb.latestMD.LatestSequence >= md.LatestSequence {
+		cb.lock.Unlock()
 		return
 	}
 	cb.latestMD = *md
