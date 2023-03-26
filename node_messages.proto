@@ -11,7 +11,7 @@ import "google/protobuf/empty.proto";
 package fabrico;
 
 service NodeExchange {
-   rpc ConsensusMessage(stream Consensus) returns(google.protobuf.Empty) {}
+   rpc ConsensusMessage(Consensus) returns(google.protobuf.Empty) {}
    rpc FetchBlocks(BlockPosition) returns(stream BlockRecord) {}
    rpc DownloadContent(ContentID) returns(stream ContentChunk) {}
 }

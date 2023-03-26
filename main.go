@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 var (
@@ -81,7 +83,11 @@ func main() {
 	go func() {
 		time.Sleep(10 * time.Second)
 		for i := 1; i < 3; i++ {
-			node.Submit(Request{ID: strconv.Itoa(i), ClientID: fmt.Sprintf("node-%v", *selfID)})
+			reqID, err := uuid.NewRandom()
+			if err != nil {
+				log.Fatal(err)
+			}
+			node.Submit(Request{ID: reqID.String(), ClientID: fmt.Sprintf("node-%v", *selfID)})
 			time.Sleep(1 * time.Second)
 		}
 	}()

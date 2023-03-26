@@ -11,9 +11,7 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
-	"log"
 	"net"
 	"sort"
 	"strconv"
@@ -28,7 +26,7 @@ import (
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/protobuf/proto"
 	anypb "google.golang.org/protobuf/types/known/anypb"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 const (
@@ -64,7 +62,7 @@ type Node struct {
 	listener net.Listener
 
 	nodeChannels  map[NodeID]*grpc.ClientConn
-	nodeExchanges map[NodeID]chan proto.Message
+	nodeExchanges map[NodeID]NodeExchangeClient
 
 	h          handler
 	cb         *committedBatches
@@ -84,7 +82,7 @@ func StartNode(id NodeID, h handler, app *App, tlsPaths TLSPaths) (*Node, error)
 		peers:        make(map[NodeID]*Peer),
 
 		nodeChannels:  make(map[NodeID]*grpc.ClientConn),
-		nodeExchanges: make(map[NodeID]chan proto.Message),
+		nodeExchanges: make(map[NodeID]NodeExchangeClient),
 		id:            id,
 		app:           app,
 	}
@@ -119,6 +117,7 @@ func StartNode(id NodeID, h handler, app *App, tlsPaths TLSPaths) (*Node, error)
 			node.Lock()
 			node.peers[peer.PeerID] = &peer
 			node.Unlock()
+
 			err := node.Connect(peer.PeerID)
 			if err != nil {
 				node.app.logger.Error("Error connecting to node:", err)
@@ -185,7 +184,7 @@ func StartNode(id NodeID, h handler, app *App, tlsPaths TLSPaths) (*Node, error)
 	grpcServer := grpc.NewServer(
 		grpc.Creds(node.transportCred),
 	)
-	RegisterNodeExchangeServer(grpcServer, &nodeExchange{messageChannel: node.in, committedBatches: node.cb, store: node.app.Store})
+	RegisterNodeExchangeServer(grpcServer, &nodeExchange{NodeId: uint64(node.id), messageChannel: node.in, committedBatches: node.cb, store: node.app.Store})
 	go grpcServer.Serve(node.listener)
 
 	go node.serve()
@@ -193,63 +192,43 @@ func StartNode(id NodeID, h handler, app *App, tlsPaths TLSPaths) (*Node, error)
 }
 
 func (n *Node) Connect(id NodeID) error {
+
+	retry := func() {
+		n.Lock()
+		n.nodeChannels[id].Close()
+		delete(n.nodeChannels, id)
+		n.Unlock()
+		go n.Connect(id)
+	}
+
 	n.Lock()
-
-	time.Sleep(10 * time.Second)
-
 	peer := n.peers[id]
+	n.Unlock()
 
-	conn, err := grpc.Dial(fmt.Sprintf("%s:%v", peer.Hostname, peer.Port), grpc.WithTransportCredentials(n.transportCred), grpc.WithKeepaliveParams(keepalive.ClientParameters{
+	conn, err := grpc.Dial(fmt.Sprintf("%s:%v", peer.Hostname, peer.Port), grpc.WithTimeout(5*time.Second), grpc.WithBlock(), grpc.WithTransportCredentials(n.transportCred), grpc.WithKeepaliveParams(keepalive.ClientParameters{
 		Time:                10 * time.Second,
 		PermitWithoutStream: true,
 	}))
 
 	if err != nil {
+		go retry()
 		return err
 	}
+
+	n.Lock()
 	n.nodeChannels[id] = conn
-
-	client := NewNodeExchangeClient(conn)
-	msgHandler, err := client.ConsensusMessage(context.TODO())
-	if err != nil {
-		return err
-	}
-
-	msgChan := make(chan proto.Message, 1)
-	n.nodeExchanges[id] = msgChan
 	n.Unlock()
 
-	go func() {
-		for msg := range msgChan {
-			any, err := anypb.New(msg)
-			if err != nil {
-				panic(err)
-			}
-			//TODO proper error handling, shutdown
-			err = msgHandler.Send(&Consensus{
-				Node:    uint64(n.id),
-				Message: any,
-			})
-			if err != nil {
-				n.app.logger.Errorf("Error sending message to client %v: %v", id, err)
-				// Try reconnecting client
-				n.app.logger.Debug("Reconnecting client ", id)
-				n.Lock()
-				n.nodeChannels[id].Close()
-				n.Unlock()
-				go n.Connect(id)
-				return
-			}
-		}
-	}()
+	client := NewNodeExchangeClient(conn)
+
+	n.Lock()
+	n.nodeExchanges[id] = client
+	n.Unlock()
 
 	return nil
 }
 
 func (n *Node) send(source, target NodeID, msg proto.Message) {
-
-	n.app.logger.Debug("Sending message to node", target)
-
 	n.Lock()
 	dstNode, found := n.nodeExchanges[target]
 	n.Unlock()
@@ -258,9 +237,17 @@ func (n *Node) send(source, target NodeID, msg proto.Message) {
 		panic("node doesn't exist")
 	}
 
-	select {
-	case dstNode <- msg:
-	default:
+	any, err := anypb.New(msg)
+	if err != nil {
+		panic(err)
+	}
+	//TODO proper error handling, shutdown
+	_, err = dstNode.ConsensusMessage(context.TODO(), &Consensus{
+		Node:    uint64(n.id),
+		Message: any,
+	})
+
+	if err != nil {
 		n.app.logger.Error("Dropped msg from", source, "to", target, "due to overflow")
 	}
 }
@@ -272,12 +259,12 @@ func (node *Node) SendConsensus(targetID uint64, m *smartbftprotos.Message) {
 
 // SendTransaction sends a client's request to a target node
 func (node *Node) SendTransaction(targetID uint64, request []byte) {
-	node.send(node.id, NodeID(targetID), &FwdMessage{Payload: request})
+	node.send(node.id, NodeID(targetID), &FwdMessage{Sender: uint64(node.id), Payload: request})
 }
 
 // Nodes returns the ids of all nodes in the network
 func (node *Node) Nodes() []uint64 {
-	node.app.logger.Debug("Nodes called!")
+	//node.app.logger.Debug("Nodes called!")
 
 	var res []uint64
 
@@ -309,7 +296,7 @@ func (node *Node) serve() {
 			id := inMsg.Node
 			any := inMsg.Message
 
-			node.app.logger.Debug("Receive message:", any)
+			node.app.logger.Debug("Received message from:", id)
 
 			switch any.TypeUrl {
 			case "type.googleapis.com/smartbftprotos.Message":
@@ -324,6 +311,7 @@ func (node *Node) serve() {
 				handler.HandleMessage(uint64(id), msg)
 
 			case "type.googleapis.com/fabrico.FwdMessage":
+
 				msg := &FwdMessage{}
 				err := any.UnmarshalTo(msg)
 				if err != nil {
@@ -352,28 +340,15 @@ type nodeExchange struct {
 	UnimplementedNodeExchangeServer
 }
 
-func (n *nodeExchange) ConsensusMessage(stream NodeExchange_ConsensusMessageServer) error {
-	for {
-		senderMsg, err := stream.Recv()
-		if err == io.EOF {
-			err = stream.SendAndClose(&emptypb.Empty{})
-			if err != nil {
-				log.Fatal(err)
-			}
-			return nil
-		}
+func (n *nodeExchange) ConsensusMessage(ctx context.Context, msg *Consensus) (*emptypb.Empty, error) {
 
-		if err != nil {
-			return err
-		}
-
-		if senderMsg.Node == n.NodeId {
-			// Do not receive messages sent by ourselves
-			return nil
-		}
-
-		n.messageChannel <- *senderMsg
+	if msg.Node == n.NodeId {
+		// Do not receive messages sent by ourselves
+		return &emptypb.Empty{}, nil
 	}
+
+	n.messageChannel <- *msg
+	return &emptypb.Empty{}, nil
 }
 
 func (n *nodeExchange) FetchBlocks(pos *BlockPosition, stream NodeExchange_FetchBlocksServer) error {

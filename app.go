@@ -116,8 +116,8 @@ func (a *App) Sync() types.SyncResponse {
 	client := NewNodeExchangeClient(srcConn)
 
 	fetchFrom := &BlockPosition{
-		ViewId:         a.latestMD.ViewId,
-		LatestSequence: a.latestMD.LatestSequence,
+		ViewId:         a.Consensus.Metadata.GetViewId(),
+		LatestSequence: a.Consensus.Metadata.LatestSequence,
 	}
 
 	stream, err := client.FetchBlocks(context.TODO(), fetchFrom)
@@ -447,6 +447,7 @@ func (a *App) Deliver(proposal types.Proposal, signatures []types.Signature) typ
 
 func newNode(id NodeID, walDir string, tlsPaths TLSPaths, rotateLeader bool, decisionsPerLeader uint64) *App {
 	logConfig := zap.NewDevelopmentConfig()
+	//logConfig := zap.NewProductionConfig()
 	logger, _ := logConfig.Build()
 	logger = logger.With(zap.Int64("id", int64(id)))
 	sugaredLogger := logger.Sugar()

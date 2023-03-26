@@ -137,7 +137,6 @@ func (d *MdnsDiscoverer) Start(self Peer) error {
 			if entry.Instance == d.selfInstance {
 				continue
 			}
-			log.Println(entry)
 			instanceSplit := strings.Split(entry.Instance, "-")
 			if len(instanceSplit) != 2 {
 				continue
@@ -147,6 +146,7 @@ func (d *MdnsDiscoverer) Start(self Peer) error {
 				continue
 			}
 
+			log.Println(entry)
 			d.AddPeer(Peer{
 				PeerID:   NodeID(peerID),
 				Hostname: "localhost",

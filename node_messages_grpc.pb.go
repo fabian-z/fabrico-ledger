@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NodeExchangeClient interface {
-	ConsensusMessage(ctx context.Context, opts ...grpc.CallOption) (NodeExchange_ConsensusMessageClient, error)
+	ConsensusMessage(ctx context.Context, in *Consensus, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	FetchBlocks(ctx context.Context, in *BlockPosition, opts ...grpc.CallOption) (NodeExchange_FetchBlocksClient, error)
 	DownloadContent(ctx context.Context, in *ContentID, opts ...grpc.CallOption) (NodeExchange_DownloadContentClient, error)
 }
@@ -36,42 +36,17 @@ func NewNodeExchangeClient(cc grpc.ClientConnInterface) NodeExchangeClient {
 	return &nodeExchangeClient{cc}
 }
 
-func (c *nodeExchangeClient) ConsensusMessage(ctx context.Context, opts ...grpc.CallOption) (NodeExchange_ConsensusMessageClient, error) {
-	stream, err := c.cc.NewStream(ctx, &NodeExchange_ServiceDesc.Streams[0], "/fabrico.NodeExchange/ConsensusMessage", opts...)
+func (c *nodeExchangeClient) ConsensusMessage(ctx context.Context, in *Consensus, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/fabrico.NodeExchange/ConsensusMessage", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &nodeExchangeConsensusMessageClient{stream}
-	return x, nil
-}
-
-type NodeExchange_ConsensusMessageClient interface {
-	Send(*Consensus) error
-	CloseAndRecv() (*emptypb.Empty, error)
-	grpc.ClientStream
-}
-
-type nodeExchangeConsensusMessageClient struct {
-	grpc.ClientStream
-}
-
-func (x *nodeExchangeConsensusMessageClient) Send(m *Consensus) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *nodeExchangeConsensusMessageClient) CloseAndRecv() (*emptypb.Empty, error) {
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	m := new(emptypb.Empty)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
+	return out, nil
 }
 
 func (c *nodeExchangeClient) FetchBlocks(ctx context.Context, in *BlockPosition, opts ...grpc.CallOption) (NodeExchange_FetchBlocksClient, error) {
-	stream, err := c.cc.NewStream(ctx, &NodeExchange_ServiceDesc.Streams[1], "/fabrico.NodeExchange/FetchBlocks", opts...)
+	stream, err := c.cc.NewStream(ctx, &NodeExchange_ServiceDesc.Streams[0], "/fabrico.NodeExchange/FetchBlocks", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +78,7 @@ func (x *nodeExchangeFetchBlocksClient) Recv() (*BlockRecord, error) {
 }
 
 func (c *nodeExchangeClient) DownloadContent(ctx context.Context, in *ContentID, opts ...grpc.CallOption) (NodeExchange_DownloadContentClient, error) {
-	stream, err := c.cc.NewStream(ctx, &NodeExchange_ServiceDesc.Streams[2], "/fabrico.NodeExchange/DownloadContent", opts...)
+	stream, err := c.cc.NewStream(ctx, &NodeExchange_ServiceDesc.Streams[1], "/fabrico.NodeExchange/DownloadContent", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +113,7 @@ func (x *nodeExchangeDownloadContentClient) Recv() (*ContentChunk, error) {
 // All implementations must embed UnimplementedNodeExchangeServer
 // for forward compatibility
 type NodeExchangeServer interface {
-	ConsensusMessage(NodeExchange_ConsensusMessageServer) error
+	ConsensusMessage(context.Context, *Consensus) (*emptypb.Empty, error)
 	FetchBlocks(*BlockPosition, NodeExchange_FetchBlocksServer) error
 	DownloadContent(*ContentID, NodeExchange_DownloadContentServer) error
 	mustEmbedUnimplementedNodeExchangeServer()
@@ -148,8 +123,8 @@ type NodeExchangeServer interface {
 type UnimplementedNodeExchangeServer struct {
 }
 
-func (UnimplementedNodeExchangeServer) ConsensusMessage(NodeExchange_ConsensusMessageServer) error {
-	return status.Errorf(codes.Unimplemented, "method ConsensusMessage not implemented")
+func (UnimplementedNodeExchangeServer) ConsensusMessage(context.Context, *Consensus) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConsensusMessage not implemented")
 }
 func (UnimplementedNodeExchangeServer) FetchBlocks(*BlockPosition, NodeExchange_FetchBlocksServer) error {
 	return status.Errorf(codes.Unimplemented, "method FetchBlocks not implemented")
@@ -170,30 +145,22 @@ func RegisterNodeExchangeServer(s grpc.ServiceRegistrar, srv NodeExchangeServer)
 	s.RegisterService(&NodeExchange_ServiceDesc, srv)
 }
 
-func _NodeExchange_ConsensusMessage_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(NodeExchangeServer).ConsensusMessage(&nodeExchangeConsensusMessageServer{stream})
-}
-
-type NodeExchange_ConsensusMessageServer interface {
-	SendAndClose(*emptypb.Empty) error
-	Recv() (*Consensus, error)
-	grpc.ServerStream
-}
-
-type nodeExchangeConsensusMessageServer struct {
-	grpc.ServerStream
-}
-
-func (x *nodeExchangeConsensusMessageServer) SendAndClose(m *emptypb.Empty) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *nodeExchangeConsensusMessageServer) Recv() (*Consensus, error) {
-	m := new(Consensus)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
+func _NodeExchange_ConsensusMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Consensus)
+	if err := dec(in); err != nil {
 		return nil, err
 	}
-	return m, nil
+	if interceptor == nil {
+		return srv.(NodeExchangeServer).ConsensusMessage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/fabrico.NodeExchange/ConsensusMessage",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeExchangeServer).ConsensusMessage(ctx, req.(*Consensus))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _NodeExchange_FetchBlocks_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -244,13 +211,13 @@ func (x *nodeExchangeDownloadContentServer) Send(m *ContentChunk) error {
 var NodeExchange_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "fabrico.NodeExchange",
 	HandlerType: (*NodeExchangeServer)(nil),
-	Methods:     []grpc.MethodDesc{},
-	Streams: []grpc.StreamDesc{
+	Methods: []grpc.MethodDesc{
 		{
-			StreamName:    "ConsensusMessage",
-			Handler:       _NodeExchange_ConsensusMessage_Handler,
-			ClientStreams: true,
+			MethodName: "ConsensusMessage",
+			Handler:    _NodeExchange_ConsensusMessage_Handler,
 		},
+	},
+	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "FetchBlocks",
 			Handler:       _NodeExchange_FetchBlocks_Handler,
