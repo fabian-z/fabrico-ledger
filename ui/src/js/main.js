@@ -48,7 +48,9 @@ function updateStatus() {
    document.getElementById("LeaderID").innerHTML = leaderID;
  
    document.getElementById("ViewID").innerHTML = viewID;   
-   document.getElementById("SystemNodes").innerHTML = systemNodes;   
+   
+   refreshNodes(systemNodes);
+   
    document.getElementById("LastUpdateTime").innerHTML = lastUpdateTime;
 
    document.getElementById("Records").innerHTML = records;
@@ -73,10 +75,20 @@ let updateStatusInterval = setInterval(updateStatus, 1000);
 document.getElementById("upload-submit").addEventListener('click', (event) => {
 // TODO error handling
 
-	fetch("api/addfile", {
-    body: new FormData(document.getElementById("upload-form")),
+let form = document.getElementById("upload-form");
+
+fetch("api/addfile", {
+    body: new FormData(form),
     method: "post",
 });
+
+// TODO show progress?
+// TODO check result code
+const toastLiveExample = document.getElementById('liveToast');
+const toast = new bootstrap.Toast(toastLiveExample);
+toast.show({"autohide": true});
+
+form.reset();
 
 });
 
@@ -87,10 +99,40 @@ document.getElementById("fabricate-submit").addEventListener('click', (event) =>
     method: "post",
 });
 
+// TODO check result code
+const toastLiveExample = document.getElementById('liveToast');
+const toast = new bootstrap.Toast(toastLiveExample);
+toast.show({"autohide": true});
+
 });
 
 document.getElementById("fabricate-refresh").addEventListener('click', refreshFabricate);
 document.getElementById("nav-fabricate").addEventListener('click', refreshFabricate);
+
+function refreshNodes(systemNodes) {
+  document.getElementById("SystemNodes").innerHTML = systemNodes;
+   
+  let select = document.getElementById('selectNode'); 
+  let missingNodes = systemNodes;
+
+   for (const existingNode of select.children) {
+     let cur = parseInt(existingNode.value);
+     if (systemNodes.includes(cur)) {
+      missingNodes = missingNodes.filter(function(item) {
+        return item !== cur;
+      })
+     } else {
+       existingNode.remove();
+     }
+   }
+
+   for (const node of missingNodes){
+    let opt = document.createElement('option');
+    opt.value = node;
+    opt.innerHTML = "Node " + node;
+    select.appendChild(opt);
+   }
+}
 
 function refreshFabricate() {
 	

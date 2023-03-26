@@ -32,3 +32,23 @@ color: red;
 .hidden {
   display: none;
 }
+
+.stateSVGContainer {
+  width: 600px;
+  height: 600px;
+  background: white;
+  margin-bottom: 10px;
+  text-align: center;
+  vertical-align: middle;
+  display: table-cell;
+}
+
+.stateSVG {
+  width: 450px;
+  background: white;
+}
+
+.monitoring-alert {
+  color: red;
+  font-weight: bold;
+}
