@@ -23,6 +23,7 @@ Chart.defaults.color = '#fff';
 //	SystemNodes    []uint64
 //	LastUpdateTime string
 
+
 let nodeID;
 let leaderID;
 let viewID;
@@ -52,8 +53,16 @@ function updateStatus() {
 
    document.getElementById("Records").innerHTML = records;
    document.getElementById("TotalFiles").innerHTML = totalFiles;
+
+   document.getElementById("connectionIndicator").classList.remove("hidden");
+   document.getElementById("errorIndicator").classList.add("hidden");
+
    })
  .catch((error) => {
+
+  document.getElementById("connectionIndicator").classList.add("hidden");
+  document.getElementById("errorIndicator").classList.remove("hidden");
+
    console.error('Error:', error);
  });
 

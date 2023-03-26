@@ -65,7 +65,7 @@ func (a *APIServer) NodeStatus(w http.ResponseWriter, _ *http.Request) {
 		NodeID:         a.Node.id,
 		LeaderID:       a.Node.app.Consensus.GetLeaderID(),
 		SystemNodes:    a.Node.Nodes(),
-		ViewID:         a.Node.app.latestMD.ViewId,
+		ViewID:         a.Node.cb.latestMD.ViewId,
 		LastUpdateTime: time.Now().Format(time.RFC1123),
 		Records:        records,
 		TotalFiles:     knownFiles,
