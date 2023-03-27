@@ -46,6 +46,20 @@ The user interface for interacting with the distributed ledger is written in HTM
 
 ![Fabricate](https://raw.githubusercontent.com/fabian-z/fabrico-ledger/main/res/screenshots/monitor-demo.png)
 
+## Building / Running
+
+Tested only on Linux, should work on every Go supported OS. Replace <node> with a unique ID, starting with 1.
+Executing >= 4 nodes is recommended for stability.
+
+```
+go build
+./fabrico-ledge -id <node>
+```
+
+## Contributions
+
+Contributions and issues are always welcome. Feel free to create an issue or fork the repository and experiment or make a pull request.
+
 ## License
 
 This work is licensed under Apache License.
