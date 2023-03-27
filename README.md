@@ -32,15 +32,19 @@ The user interface for interacting with the distributed ledger is written in HTM
 
 **System information**
 
-![System information](https://github.com/fabian-z/fabrico-ledger/raw/main/res/screenshots/info-dummy.png)
+![System information](https://github.com/fabian-z/fabrico-ledger/raw/main/res/screenshots/system-information.png)
 
 **Upload source data**
 
-![Upload](https://raw.githubusercontent.com/fabian-z/fabrico-ledger/main/res/screenshots/upload.png)
+![Upload](https://raw.githubusercontent.com/fabian-z/fabrico-ledger/main/res/screenshots/upload-action.png)
 
 **Fabricate data file**
 
 ![Fabricate](https://raw.githubusercontent.com/fabian-z/fabrico-ledger/main/res/screenshots/fabricate.png)
+
+**Monitoring example**
+
+![Fabricate](https://raw.githubusercontent.com/fabian-z/fabrico-ledger/main/res/screenshots/monitor-demo.png)
 
 ## License
 
